@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.mobiground.configuration.factory.impl.SpringPropertyResolverTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2016-09-13T07:01:57" hostname="quicksilver" time="0.393">
+  <properties/>
+  <testcase name="shouldReturnPropertiesPTest" classname="com.mobiground.configuration.factory.impl.SpringPropertyResolverTest" time="0.374"/>
+  <testcase name="shouldReturnPropertiesTest" classname="com.mobiground.configuration.factory.impl.SpringPropertyResolverTest" time="0.012"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

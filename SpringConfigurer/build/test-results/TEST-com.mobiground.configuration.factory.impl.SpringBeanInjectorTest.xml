@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.mobiground.configuration.factory.impl.SpringBeanInjectorTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2016-09-13T07:01:58" hostname="quicksilver" time="0.012">
+  <properties/>
+  <testcase name="shouldAddDependencyByNameTest" classname="com.mobiground.configuration.factory.impl.SpringBeanInjectorTest" time="0.002"/>
+  <testcase name="shouldAddDependencyWithoutDependencyTest" classname="com.mobiground.configuration.factory.impl.SpringBeanInjectorTest" time="0.001"/>
+  <testcase name="shouldGetBeanDefinitonTest" classname="com.mobiground.configuration.factory.impl.SpringBeanInjectorTest" time="0.0"/>
+  <testcase name="shouldAddDependencyTest" classname="com.mobiground.configuration.factory.impl.SpringBeanInjectorTest" time="0.001"/>
+  <testcase name="shouldAddDependenciesTest" classname="com.mobiground.configuration.factory.impl.SpringBeanInjectorTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

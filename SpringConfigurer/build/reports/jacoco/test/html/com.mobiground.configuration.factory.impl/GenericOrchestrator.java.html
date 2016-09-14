@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>GenericOrchestrator.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SpringConfigurer</a> &gt; <a href="index.source.html" class="el_package">com.mobiground.configuration.factory.impl</a> &gt; <span class="el_source">GenericOrchestrator.java</span></div><h1>GenericOrchestrator.java</h1><pre class="source lang-java linenums">package com.mobiground.configuration.factory.impl;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+import org.springframework.context.ApplicationContext;
+
+import com.mobiground.configuration.factory.BeanInjector;
+import com.mobiground.configuration.factory.ConfigurationClassResolver;
+import com.mobiground.configuration.factory.Orchestrator;
+import com.mobiground.configuration.factory.PropertyResolver;
+import com.mobiground.configuration.factory.PropertySetter;
+import com.mobiground.configuration.factory.bean.MobiBeanDefinition;
+import com.mobiground.ecap.configuration.Configuration;
+import com.mobiground.ecap.util.string.UString;
+
+/**
+ * The Class GenericOrchestrator.
+ *
+ * @param &lt;CONFIG_CLASS&gt; the generic type
+ */
+<span class="fc" id="L26">public class GenericOrchestrator&lt;CONFIG_CLASS extends Configuration&gt; implements Orchestrator {</span>
+
+	/** The property setter. */
+	private PropertySetter propertySetter;
+
+	/** The property resolver. */
+	private PropertyResolver propertyResolver;
+
+	/** The bean injector. */
+	private BeanInjector beanInjector;
+	/** The configuration class resolver. */
+	private ConfigurationClassResolver configurationClassResolver;
+
+	/** The bean definition. */
+	private List&lt;MobiBeanDefinition&gt; beanDefinition;
+
+	/** The config class instances. */
+	private List&lt;CONFIG_CLASS&gt; configClassInstances;
+
+	/** The bean names. */
+	private List&lt;String&gt; beanNames;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.mobiground.configuration.factory.Orchestrator#orchestrate()
+	 */
+	@Override
+	public List&lt;MobiBeanDefinition&gt; orchestrate() {
+<span class="fc" id="L55">		setUpBeans();</span>
+<span class="fc" id="L56">		Iterator&lt;Class&lt;? extends Configuration&gt;&gt; configClassessIt = searchConfigurationClasses();</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">		while (configClassessIt.hasNext()) {</span>
+<span class="fc" id="L58">			Class&lt;CONFIG_CLASS&gt; clazz = (Class&lt;CONFIG_CLASS&gt;) configClassessIt.next();</span>
+<span class="fc" id="L59">			Map&lt;String, Properties&gt; propertiesMapClass = propertyResolver.getConfigProperties(clazz);</span>
+			try {
+<span class="fc" id="L61">				configWithProperties(clazz, propertiesMapClass);</span>
+<span class="fc" id="L62">				defaultProperties(clazz);</span>
+<span class="fc" id="L63">			} catch (InstantiationException | IllegalAccessException e) {</span>
+				// TODO mirar excepciones aquí
+<span class="fc" id="L65">				e.printStackTrace();</span>
+<span class="fc" id="L66">			}</span>
+
+<span class="fc" id="L68">		}</span>
+<span class="fc" id="L69">		setBeanDefinition();</span>
+<span class="fc" id="L70">		setBeanNames();</span>
+<span class="fc" id="L71">		return this.beanDefinition;</span>
+	}
+
+	/**
+	 * Default properties.
+	 *
+	 * @param clazz the clazz
+	 * @throws InstantiationException the instantiation exception
+	 * @throws IllegalAccessException the illegal access exception
+	 */
+	private void defaultProperties(Class&lt;CONFIG_CLASS&gt; clazz) throws InstantiationException, IllegalAccessException {
+<span class="fc" id="L82">		CONFIG_CLASS instanceClass = null;</span>
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">		if (instanceClass == null) {</span>
+<span class="fc" id="L84">			instanceClass = clazz.newInstance();</span>
+<span class="fc" id="L85">			instanceClass.setConfigName(UString.EMPTY);</span>
+<span class="fc" id="L86">			configClassInstances.add(instanceClass);</span>
+		}
+<span class="fc" id="L88">	}</span>
+
+	/**
+	 * Config with properties.
+	 *
+	 * @param clazz the clazz
+	 * @param propertiesMapClass the properties map class
+	 * @return the config class
+	 */
+	private CONFIG_CLASS configWithProperties(Class&lt;CONFIG_CLASS&gt; clazz, Map&lt;String, Properties&gt; propertiesMapClass) {
+<span class="fc" id="L98">		CONFIG_CLASS instanceClass = null;</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">		for (String key : propertiesMapClass.keySet()) {</span>
+<span class="fc" id="L100">			instanceClass = propertySetter.fillProperties(propertiesMapClass.get(key), clazz);</span>
+<span class="fc" id="L101">			instanceClass.setConfigName(UString.substringAfterLast(key, UString.DOT));</span>
+<span class="fc" id="L102">			configClassInstances.add(instanceClass);</span>
+<span class="fc" id="L103">		}</span>
+<span class="fc" id="L104">		return instanceClass;</span>
+	}
+
+	/**
+	 * Sets the bean definition.
+	 */
+	private void setBeanDefinition() {
+<span class="fc" id="L111">		this.beanDefinition = new ArrayList&lt;MobiBeanDefinition&gt;();</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">		for (CONFIG_CLASS classInstance : configClassInstances) {</span>
+<span class="fc" id="L113">			beanDefinition.addAll(beanInjector.getBeanDefinition(classInstance));</span>
+<span class="fc" id="L114">		}</span>
+<span class="fc" id="L115">	}</span>
+
+	/**
+	 * Sets the bean names.
+	 */
+	private void setBeanNames() {
+<span class="fc" id="L121">		this.beanNames = new ArrayList&lt;String&gt;();</span>
+<span class="fc bfc" id="L122" title="All 2 branches covered.">		for (MobiBeanDefinition mobiSpringBean : beanDefinition) {</span>
+<span class="fc" id="L123">			beanNames.add(mobiSpringBean.getBeanName());</span>
+<span class="fc" id="L124">		}</span>
+<span class="fc" id="L125">	}</span>
+
+	/**
+	 * Search configuration classes.
+	 *
+	 * @return the iterator&lt; class&lt;? extends configuration&gt;&gt;
+	 */
+	private Iterator&lt;Class&lt;? extends Configuration&gt;&gt; searchConfigurationClasses() {
+<span class="fc" id="L133">		Set&lt;Class&lt;? extends Configuration&gt;&gt; configClasses = configurationClassResolver.getDefaultConfigurationClasses();</span>
+<span class="fc" id="L134">		Iterator&lt;Class&lt;? extends Configuration&gt;&gt; configClassessIt = configClasses.iterator();</span>
+<span class="fc" id="L135">		configClassInstances = new ArrayList&lt;CONFIG_CLASS&gt;();</span>
+<span class="fc" id="L136">		return configClassessIt;</span>
+	}
+
+	/**
+	 * Sets the up beans.
+	 */
+	private void setUpBeans() {
+<span class="pc bpc" id="L143" title="1 of 2 branches missed.">		if (isAnyNotInizialized()) {</span>
+<span class="fc" id="L144">			configurationClassResolver = new ReflectionsConfigurationClassResolver();</span>
+<span class="fc" id="L145">			propertyResolver = new SpringPropertyResolver();</span>
+<span class="fc" id="L146">			propertySetter = new JacksonPorpertySetter();</span>
+<span class="fc" id="L147">			beanInjector = new SpringBeanInjector();</span>
+		}
+<span class="fc" id="L149">	}</span>
+
+	/**
+	 * Checks if is any not inizialized.
+	 *
+	 * @return true, if is any not inizialized
+	 */
+	private boolean isAnyNotInizialized() {
+<span class="pc bpc" id="L157" title="7 of 8 branches missed.">		return configurationClassResolver == null || propertyResolver == null || propertySetter == null</span>
+				|| beanInjector == null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.mobiground.configuration.factory.Orchestrator#getMobiBeanDefinition()
+	 */
+	@Override
+	public List&lt;MobiBeanDefinition&gt; getMobiBeanDefinition() {
+<span class="nc" id="L168">		return this.beanDefinition;</span>
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.mobiground.configuration.factory.Orchestrator#getBeanNames()
+	 */
+	@Override
+	public List&lt;String&gt; getBeanNames() {
+<span class="nc" id="L178">		return this.beanNames;</span>
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.mobiground.configuration.factory.Orchestrator#addDependencies(com.mobiground.configuration.factory.bean.
+	 * MobiBeanDefinition, org.springframework.context.ApplicationContext)
+	 */
+	@Override
+	public MobiBeanDefinition addDependencies(MobiBeanDefinition beanDefinition, ApplicationContext context) {
+<span class="nc" id="L189">		BeanInjector beanInjector = new SpringBeanInjector();</span>
+<span class="nc" id="L190">		return beanInjector.addDependencies(beanDefinition, context);</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.1.201405082137</span></div></body></html>

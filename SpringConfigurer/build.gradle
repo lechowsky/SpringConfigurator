@@ -1,0 +1,45 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+sourceCompatibility = 1.7
+group = 'com.mobiground.config'
+version = '1.0.0'
+jar {
+    baseName = 'SpringConfigurer'
+    version =  '1.0.0'
+}
+apply from: '../ecap-config/gradle/common_config.gradle'
+
+repositories {
+ 	mavenCentral()
+	ivy{
+		url "/usr/share/Gradle/repository"
+	}
+}
+
+dependencies {
+    compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
+    compile group: 'com.mobiground.web', name: 'Web-business', version: '1.0.0'
+ 	compile group: 'org.springframework', name: 'spring-context', version: getProjectProperty('dependency.external.spring.version')
+ 	compile group: 'org.reflections', name: 'reflections', version: '0.9.10'
+    
+    //Jackson mapper and binder dependencies
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.8.0'
+	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.0'
+	compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.8.0'
+    
+    //Test scopes
+   	testCompile group: 'junit', name: 'junit', version: getProjectProperty('dependency.external.junit.version')
+}
+
+uploadArchives {
+	repositories {
+		ivy {
+			url "/usr/share/Gradle/repository"
+		}
+	}
+
+	doLast {
+		println "The JAR file has been uploaded to local repository /usr/share/Gradle/repository"
+	}
+}

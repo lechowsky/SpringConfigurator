@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>SpringPropertyResolver.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">SpringConfigurer</a> &gt; <a href="index.source.html" class="el_package">com.mobiground.configuration.factory.impl</a> &gt; <span class="el_source">SpringPropertyResolver.java</span></div><h1>SpringPropertyResolver.java</h1><pre class="source lang-java linenums">package com.mobiground.configuration.factory.impl;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+import org.reflections.Reflections;
+import org.reflections.scanners.ResourcesScanner;
+
+import com.mobiground.configuration.factory.PropertyResolver;
+import com.mobiground.ecap.configuration.Configuration;
+import com.mobiground.ecap.util.file.UFile;
+import com.mobiground.ecap.util.string.UString;
+
+/**
+ * The Class SpringPropertyResolver.
+ */
+<span class="fc" id="L23">public class SpringPropertyResolver implements PropertyResolver {</span>
+
+	/** The Constant CONFIGURATION_PROPERTIES_SUFFIX. */
+	protected static final String CONFIGURATION_PROPERTIES_SUFFIX = &quot;.configuration.properties&quot;;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.mobiground.configuration.factory.PropertyResolver#getConfigProperties()
+	 */
+	@Override
+	public Map&lt;String, Properties&gt; getConfigProperties() {
+
+<span class="fc" id="L36">		Reflections reflections = new Reflections(&quot;&quot;, new ResourcesScanner());</span>
+<span class="fc" id="L37">		Set&lt;String&gt; propertiesPaths =</span>
+				reflections.getResources(Pattern.compile(UString.join(&quot;.*&quot;, CONFIGURATION_PROPERTIES_SUFFIX)));
+<span class="fc" id="L39">		return getPropertiesMap(propertiesPaths);</span>
+	}
+
+	/**
+	 * Gets the properties map.
+	 *
+	 * @param paths the paths
+	 * @return the properties map
+	 */
+	private Map&lt;String, Properties&gt; getPropertiesMap(final Set&lt;String&gt; paths) {
+<span class="fc" id="L49">		Map&lt;String, Properties&gt; propertiesMap = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L50">		Iterator&lt;String&gt; pathsIterator = paths.iterator();</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">		while (pathsIterator.hasNext()) {</span>
+<span class="fc" id="L52">			String path = (String) pathsIterator.next();</span>
+<span class="fc" id="L53">			propertiesMap</span>
+				.put(UString.rigthFromLastIndexOf(UString.replace(path, CONFIGURATION_PROPERTIES_SUFFIX, UString.EMPTY),
+					UFile.SYSTEM_SEPARATOR), getProperty(path));
+<span class="fc" id="L56">		}</span>
+
+<span class="fc" id="L58">		return propertiesMap;</span>
+	}
+
+	/**
+	 * Gets the property.
+	 *
+	 * @param propertyPath the property path
+	 * @return the property
+	 */
+	private Properties getProperty(final String propertyPath) {
+
+<span class="fc" id="L69">		Properties properties = new Properties();</span>
+<span class="fc" id="L70">		InputStream stream = ClassLoader.getSystemResourceAsStream(propertyPath);</span>
+		try {
+<span class="fc" id="L72">			properties.load(stream);</span>
+<span class="nc" id="L73">		} catch (IOException e) {</span>
+			// TODO generar exception
+<span class="nc" id="L75">			e.printStackTrace();</span>
+<span class="fc" id="L76">		}</span>
+<span class="fc" id="L77">		return properties;</span>
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.mobiground.configuration.factory.PropertyResolver#getConfigProperties(java.lang.Class)
+	 */
+	@Override
+	public &lt;CONFIG_CLASS extends Configuration&gt; Map&lt;String, Properties&gt; getConfigProperties(
+			final Class&lt;CONFIG_CLASS&gt; configurationClass) {
+<span class="fc" id="L88">		Map&lt;String, Properties&gt; propertiesMap = getConfigProperties();</span>
+<span class="fc" id="L89">		Map&lt;String, Properties&gt; propertiesMapClean = new HashMap&lt;String, Properties&gt;();</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">		for (String key : propertiesMap.keySet()) {</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">			if (UString.containsIgnoreCase(configurationClass.getSimpleName(), UString.leftFrom(key, UString.DOT))) {</span>
+<span class="fc" id="L92">				propertiesMapClean.put(key, propertiesMap.get(key));</span>
+			}
+<span class="fc" id="L94">		}</span>
+<span class="fc" id="L95">		return propertiesMapClean;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.1.201405082137</span></div></body></html>
