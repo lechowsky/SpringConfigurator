@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.mobiground.configuration.factory.impl.SpringConfigurerBeanDefinitionRegistryPostProcessorTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2016-09-13T07:01:58" hostname="quicksilver" time="0.347">
-  <properties/>
-  <testcase name="shouldPostProcessBeanFactoryTest" classname="com.mobiground.configuration.factory.impl.SpringConfigurerBeanDefinitionRegistryPostProcessorTest" time="0.298"/>
-  <testcase name="shouldPostProcessBeanDefinitionRegistryTest" classname="com.mobiground.configuration.factory.impl.SpringConfigurerBeanDefinitionRegistryPostProcessorTest" time="0.045"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
